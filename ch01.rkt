@@ -184,3 +184,52 @@
 
 (check-equal? (swrapper 'x 'y '((x) y (z (x))))
               '((y) x (z (y))))
+
+;; Exercise 1.19
+; list-set: S-list x Int x S-exp -> S-list
+; usage: (list-set lst n x) returns a list like lst, except that the n-th
+;        element, using zero-based indexing, is x.
+(define (list-set lst n x)
+  (if (zero? n)
+    (cons x (cdr lst))
+    (cons (car lst)
+          (list-set (cdr lst) (- n 1) x))))
+
+(check-equal? (list-set '(a b c d) 2 '(1 2))
+              '(a b (1 2) d))
+
+(check-equal? (list-ref (list-set '(a b c d) 3 '(1 5 10)) 3)
+              '(1 5 10))
+
+;; Exercise 1.20
+; count-occurrences: S-exp x S-List -> Int
+; usage: (count-occurrences s slist) returns the number of occurrences of s in slist.
+(define (count-occurrences s slist)
+  (if (null? slist)
+    0
+    (let ([sexp (car slist)])
+      (+ (if (pair? sexp)
+           (count-occurrences s sexp)
+           (if (eqv? sexp s) 1 0))
+         (count-occurrences s (cdr slist))))))
+
+(check-equal? (count-occurrences 'x '((f x) y (((x z) x)))) 3)
+(check-equal? (count-occurrences 'x '((f x) y (((x z) () x)))) 3)
+(check-equal? (count-occurrences 'w '((f x) y (((x z) x)))) 0)
+
+;; Exercise 1.21
+
+; product: List-of(Sym) x List-of(Sym) -> List-of(List-of(Sym))
+; usage: (product sos1 sos2), where sos1 and sos2 are each a list
+;        of symbols without repetitions, returns a list of 2-lists that represents the Cartesian
+;        product of sos1 and sos2. The 2-lists may appear in any order.
+;;TODO not working
+(define (product sos1 sos2)
+  (if (null? sos2)
+    '()
+    (cons (list (car sos1) (car sos2))
+        (list (product sos1 (cdr sos2))
+              (product (cdr sos1) sos2)))))
+
+(check-equal? (product '(a b c) '(x y))
+              '((a x) (a y) (b x) (b y) (c x) (c y)))
